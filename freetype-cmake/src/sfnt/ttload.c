@@ -939,6 +939,9 @@
             /* invalid entry; ignore it */
             entry->stringLength = 0;
           }
+
+          /* mark the string as not yet loaded */
+          entry->string = NULL;
         }
       }
 
@@ -956,6 +959,7 @@
     {
       TT_Name  entry = table->names;
       FT_UInt  count = table->numNameRecords;
+      FT_UInt  valid = 0;
 
 
       for ( ; count > 0; count-- )
@@ -988,15 +992,18 @@
           }
         }
 
+        /* mark the string as not yet converted */
+        entry->string = NULL;
+
+        valid++;
         entry++;
       }
 
       /* reduce array size to the actually used elements */
-      count = (FT_UInt)( entry - table->names );
-      (void)FT_QRENEW_ARRAY( table->names,
-                             table->numNameRecords,
-                             count );
-      table->numNameRecords = count;
+      FT_MEM_QRENEW_ARRAY( table->names,
+                           table->numNameRecords,
+                           valid );
+      table->numNameRecords = valid;
     }
 
     FT_FRAME_EXIT();

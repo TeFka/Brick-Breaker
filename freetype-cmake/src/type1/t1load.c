@@ -580,7 +580,7 @@
   {
     FT_Error  error;
     PS_Blend  blend = face->blend;
-    FT_UInt   n, p;
+    FT_UInt   n;
     FT_Fixed  final_blends[T1_MAX_MM_DESIGNS];
 
 
@@ -599,7 +599,7 @@
       PS_DesignMap  map     = blend->design_map + n;
       FT_Long*      designs = map->design_points;
       FT_Fixed*     blends  = map->blend_points;
-      FT_Int        before  = -1, after = -1;
+      FT_Int        p, before  = -1, after = -1;
 
 
       /* use a default value if we don't have a coordinate */
@@ -608,7 +608,7 @@
       else
         design = ( designs[map->num_points - 1] - designs[0] ) / 2;
 
-      for ( p = 0; p < (FT_UInt)map->num_points; p++ )
+      for ( p = 0; p < (FT_Int)map->num_points; p++ )
       {
         FT_Long  p_design = designs[p];
 
@@ -622,11 +622,11 @@
 
         if ( design < p_design )
         {
-          after = (FT_Int)p;
+          after = p;
           break;
         }
 
-        before = (FT_Int)p;
+        before = p;
       }
 
       /* now interpolate if necessary */
@@ -1336,7 +1336,7 @@
 
   static int
   read_binary_data( T1_Parser  parser,
-                    FT_ULong*  size,
+                    FT_Long*   size,
                     FT_Byte**  base,
                     FT_Bool    incremental )
   {
@@ -1368,7 +1368,7 @@
       if ( s >= 0 && s < limit - *base )
       {
         parser->root.cursor += s + 1;
-        *size = (FT_ULong)s;
+        *size = s;
         return !parser->root.error;
       }
     }
@@ -1793,7 +1793,7 @@
     for ( count = 0; ; count++ )
     {
       FT_Long   idx;
-      FT_ULong  size;
+      FT_Long   size;
       FT_Byte*  base;
 
 
@@ -1851,7 +1851,7 @@
         /* some fonts define empty subr records -- this is not totally */
         /* compliant to the specification (which says they should at   */
         /* least contain a `return'), but we support them anyway       */
-        if ( size < (FT_ULong)face->type1.private_dict.lenIV )
+        if ( size < face->type1.private_dict.lenIV )
         {
           error = FT_THROW( Invalid_File_Format );
           goto Fail;
@@ -1862,7 +1862,7 @@
           goto Fail;
         FT_MEM_COPY( temp, base, size );
         psaux->t1_decrypt( temp, size, 4330 );
-        size -= (FT_ULong)face->type1.private_dict.lenIV;
+        size -= face->type1.private_dict.lenIV;
         error = T1_Add_Table( table, (FT_Int)idx,
                               temp + face->type1.private_dict.lenIV, size );
         FT_FREE( temp );
@@ -1967,7 +1967,7 @@
 
     for (;;)
     {
-      FT_ULong  size;
+      FT_Long   size;
       FT_Byte*  base;
 
 
@@ -2061,7 +2061,7 @@
           FT_Byte*  temp = NULL;
 
 
-          if ( size <= (FT_ULong)face->type1.private_dict.lenIV )
+          if ( size <= face->type1.private_dict.lenIV )
           {
             error = FT_THROW( Invalid_File_Format );
             goto Fail;
@@ -2072,7 +2072,7 @@
             goto Fail;
           FT_MEM_COPY( temp, base, size );
           psaux->t1_decrypt( temp, size, 4330 );
-          size -= (FT_ULong)face->type1.private_dict.lenIV;
+          size -= face->type1.private_dict.lenIV;
           error = T1_Add_Table( code_table, n,
                                 temp + face->type1.private_dict.lenIV, size );
           FT_FREE( temp );
@@ -2324,7 +2324,7 @@
       else if ( *cur == 'R' && cur + 6 < limit && *(cur + 1) == 'D' &&
                 have_integer )
       {
-        FT_ULong  s;
+        FT_Long   s;
         FT_Byte*  b;
 
 
@@ -2337,7 +2337,7 @@
       else if ( *cur == '-' && cur + 6 < limit && *(cur + 1) == '|' &&
                 have_integer )
       {
-        FT_ULong  s;
+        FT_Long   s;
         FT_Byte*  b;
 
 
