@@ -76,10 +76,9 @@ private:
     float ballXOnPaddle = 0.0;
     float bumpTime = 0.0;
 
-    effect effects[100];
-    std::vector<gameObj>powerUps;
+    std::vector<effect*> effects;
+    std::vector<gameObj*> powerUps;
     int powerUpsNr = 0;
-    int effectNr=0;
 
     int passThroughBuff=0;
     int stickyBuff=0;
@@ -92,21 +91,21 @@ public:
 
     void doInput(GLFWwindow*, float, float&, float);
 
-    dirr checkDirr(glm::vec2);
+    dirr checkDirr(glm::vec2&);
 
-    glm::vec3 checkCollision(gameObj, gameObj);
+    glm::vec3 checkCollision(gameObj*, gameObj*);
 
     void spawnPowerUp(glm::vec2,glm::vec2, glm::vec3);
 
-    void updatePowerUp(RenderEngine2D*,float, gameObj&,glm::vec2&);
+    void updatePowerUp(RenderEngine2D*,float, gameObj*,glm::vec2&);
 
-    void updateEffect(float, gameObj&,glm::vec2&);
+    void updateEffect(float, gameObj*,glm::vec2&);
 
-    void updateLevel(RenderEngine2D*, gameLevel*, gameObj&, glm::vec2&, gameObj&, float);
+    void updateLevel(RenderEngine2D*, gameLevel*, gameObj*, glm::vec2&, gameObj*, float);
 
-    void resetLevel(gameLevel& level, float paddleX);
+    void resetLevel(gameLevel* level, float paddleX);
 
-    void moveBall(gameObj&, glm::vec2&, float, float, float, gameLevel&, float);
+    void moveBall(gameObj*, glm::vec2&, float, float, float, gameLevel*, float);
 
     int getWidth();
     int getHeight();
@@ -126,8 +125,8 @@ public:
 
     float getBumpTime();
 
-    effect* getEffects();
-    std::vector<gameObj> getPowerUps();
+    std::vector<effect*> getEffects();
+    std::vector<gameObj*> getPowerUps();
     int getPowerUpsNr();
     int getEffectNr();
 

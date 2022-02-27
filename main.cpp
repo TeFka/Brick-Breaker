@@ -51,11 +51,11 @@ int main()
 	string rootDir = ROOT_DIR;
 	string shaderDir = "Resources/shaders/";
 	string shaderNames[8] = {"basic_vert.glsl", "basic_frag.glsl", "char_vert.glsl", "char_frag.glsl", "particle_vert.glsl", "particle_frag.glsl", "screens_vert.glsl", "screens_frag.glsl"};
-	
+
 	string textureDir = "Resources/textures/";
-	string textureNames[11] = {"block.png", "block_solid.png", "background.jpg", "gboll.png", "powerup_chaos.png", 
+	string textureNames[11] = {"block.png", "block_solid.png", "background.jpg", "gboll.png", "powerup_chaos.png",
 							  "powerup_increase.png", "powerup_confuse.png", "powerup_passthrough.png", "powerup_sticky.png", "powerup_speed.png", "particle.png"};
-	
+
 	string levelDir = "Levels/";
 	string levelNames[5] = {"level1.txt", "level2.txt", "level3.txt", "level4.txt", "level5.txt"};
     //Shaders
@@ -66,7 +66,7 @@ int main()
     int screenShaderNum = gameEngine.setShader((rootDir + shaderDir + shaderNames[6]).c_str(),(rootDir + shaderDir + shaderNames[7]).c_str());
 
     gameEngine.setShaderUniforms(charShaderNum,screenShaderNum);
-	
+
     //Textures
     gameEngine.setTexture((rootDir + textureDir + textureNames[0]).c_str(),1,1);
     gameEngine.setTexture((rootDir + textureDir + textureNames[1]).c_str(),2,1);
@@ -79,14 +79,14 @@ int main()
     gameEngine.setTexture((rootDir + textureDir + textureNames[8]).c_str(),10,1);
     gameEngine.setTexture((rootDir + textureDir + textureNames[9]).c_str(),11,1);
     gameEngine.setTexture((rootDir + textureDir + textureNames[10]).c_str(),5,2);
-	
+
     //Game levelsadfa
-    vector<gameLevel> levels;
-    gameLevel lvl1((rootDir + levelDir + levelNames[0]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
-    gameLevel lvl2((rootDir + levelDir + levelNames[1]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
-    gameLevel lvl3((rootDir + levelDir + levelNames[2]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
-    gameLevel lvl4((rootDir + levelDir + levelNames[3]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
-    gameLevel lvl5((rootDir + levelDir + levelNames[4]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
+    vector<gameLevel*> levels;
+    gameLevel* lvl1 = new gameLevel((rootDir + levelDir + levelNames[0]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
+    gameLevel* lvl2 = new gameLevel((rootDir + levelDir + levelNames[1]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
+    gameLevel* lvl3 = new gameLevel((rootDir + levelDir + levelNames[2]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
+    gameLevel* lvl4 = new gameLevel((rootDir + levelDir + levelNames[3]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
+    gameLevel* lvl5 = new gameLevel((rootDir + levelDir + levelNames[4]).c_str(),brickGame.getWidth(),brickGame.getHeight(),1,2);
     levels.push_back(lvl1);
     levels.push_back(lvl2);
     levels.push_back(lvl3);
@@ -128,21 +128,18 @@ int main()
         {
             if(brickGame.getGameSTATE()==GAME_ACTIVE)
             {
-                brickGame.moveBall(ball,ballSpeed,paddle.pos.y-paddleH/2,paddle.pos.x,paddleW, levels[brickGame.getCurrLevel()-1],gameEngine.getDeltaTime());
-                brickGame.updateEffect(gameEngine.getDeltaTime(),paddle,ballSpeed);
+                brickGame.moveBall(&ball,ballSpeed,paddle.pos.y-paddleH/2,paddle.pos.x,paddleW, levels[brickGame.getCurrLevel()-1],gameEngine.getDeltaTime());
+                brickGame.updateEffect(gameEngine.getDeltaTime(),&paddle,ballSpeed);
 
                 gameEngine.setSprite(vec2(brickGame.getWidth()/2,brickGame.getHeight()/2), vec2(brickGame.getWidth(),brickGame.getHeight()), vec4(1.0,0.0,1.0,0.7), 3);
-                brickGame.updateLevel(&gameEngine, &levels[brickGame.getCurrLevel()-1],ball,ballSpeed, paddle, gameEngine.getDeltaTime());
-
-                levels[brickGame.getCurrLevel()-1].draw(&gameEngine);
+                brickGame.updateLevel(&gameEngine, levels[brickGame.getCurrLevel()-1],&ball, ballSpeed, &paddle, gameEngine.getDeltaTime());
+                levels[brickGame.getCurrLevel()-1]->draw(&gameEngine);
                 gameEngine.setSprite(paddle.pos, paddle.siz, vec4(paddle.col,0.9), 1);
                 gameEngine.setSprite(ball.pos, ball.siz, vec4(1.0,0.0,1.0,0.7), 4);
 
                 gameEngine.updateParticleEffect(0, ball.pos);
                 gameEngine.makeParticleEffect();
-
-                brickGame.updatePowerUp(&gameEngine,gameEngine.getDeltaTime(),paddle,ballSpeed);
-
+                brickGame.updatePowerUp(&gameEngine,gameEngine.getDeltaTime(),&paddle,ballSpeed);
                 gameEngine.drawBlocks(basicShaderNum);
                 gameEngine.drawParticles(particleShaderNum);
                 stringstream ms;
@@ -157,9 +154,9 @@ int main()
                 gameEngine.writeText(charShaderNum,"Press space to go again or esc to quit",0.5f,0.4f,1.0f,vec3(0.0,1.0,0.0));
                 if(brickGame.getCurrLevel()==5)
                 {
-                    for(int i =0; i<lvl1.brickCount; i++)
+                    for(int i =0; i<lvl1->brickCount; i++)
                     {
-                        lvl1.bricks[i].exsist=1;
+                        lvl1->bricks[i].exsist=1;
                     }
                 }
             }
